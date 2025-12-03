@@ -126,44 +126,90 @@ export function buildExpenseQueryAndPipeline({
               expenseCount: "$expenseCount",
             },
           },
-
           { $limit: 12 },
         ],
       },
     },
   ];
-  //   { $match: match },
-  //   {
-  //     $facet: {
-  //       monthlyBreakdown: [
-  //         {
-  //           $group: {
-  //             _id: {
-  //               year: { $year: "$createdAt" },
-  //               month: { $month: "$createdAt" },
-  //             },
-  //             totalSpent: { $sum: "$amount" },
-  //             expenseCount: { $sum: 1 },
-  //           },
-  //         },
-  //         // NEW: Add $project to flatten and clean the data
-  //         {
-  //           $project: {
-  //             _id: 0, // Remove the _id field
-  //             year: "$_id.year",
-  //             month: "$_id.month",
-  //             totalAmount: "$totalSpent",
-  //             expenseCount: "$expenseCount",
-  //           },
-  //         },
-  //         {
-  //           $sort: { "_id.year": 1, "_id.month": 1 },
-  //         },
-  //         { $limit: 12 },
-  //       ],
-  //     },
-  //   },
-  // ];
 
-  return { pipeline, MonthlySpendingPipeline };
+  const CategoriesSpending = [
+    { $match: match },
+    {
+      $facet: {
+        categorySpend: [
+          {
+            $group: {
+              _id: "$categoryId",
+              totalAmount: { $sum: "$amount" },
+              count: { $sum: 1 },
+            },
+          },
+          {
+            $lookup: {
+              from: "categories",
+              localField: "_id",
+              foreignField: "_id",
+              as: "categoryDetails",
+            },
+          },
+          {
+            $unwind: {
+              path: "$categoryDetails",
+              preserveNullAndEmptyArrays: true,
+            },
+          },
+          {
+            $project: {
+              categoryName: "$categoryDetails.name",
+              categoryColor: "$categoryDetails.color",
+              amount: "$totalAmount",
+              count: 1,
+            },
+          },
+        ],
+        grandTotal: [
+          {
+            $group: {
+              _id: null,
+              grandTotalCategoryExpense: { $sum: "$amount" },
+            },
+          },
+        ],
+      },
+    },
+    {
+      $project: {
+        categorySpending: {
+          $map: {
+            input: "$categorySpend",
+            as: "cs",
+            in: {
+              categoryName: "$$cs.categoryName",
+              categoryColor: "$$cs.categoryColor",
+              amount: "$$cs.amount",
+              count: "$$cs.count",
+              percentage: {
+                $multiply: [
+                  {
+                    $divide: [
+                      "$$cs.amount",
+                      {
+                        $arrayElemAt: [
+                          "$grandTotal.grandTotalCategoryExpense",
+                          0,
+                        ],
+                      },
+                    ],
+                  },
+                  100,
+                ],
+              },
+            },
+          },
+        },
+      },
+    },
+  ];
+  //percentage = ($cs.amount / grandTotalCategoryExpense ) x 100
+  return { pipeline, MonthlySpendingPipeline, CategoriesSpending };
 }

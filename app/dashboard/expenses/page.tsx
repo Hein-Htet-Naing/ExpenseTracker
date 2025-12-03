@@ -17,7 +17,6 @@ import { expenseAPI } from "@/lib/api";
 import { Expense } from "@/types/expense";
 import { useCategories } from "@/hooks/useCategories";
 import { useExpensesWithCategories } from "@/hooks/useExpenses";
-import { CategoriesListSkeleton } from "@/components/skeleton/category/categoryListSkeleton";
 import { ExpensesSkeleton } from "@/components/skeleton/expense/expenseListSkeleton";
 export default function ExpensesPage() {
   const [page, setPage] = useState<number>(1);
@@ -113,7 +112,7 @@ export default function ExpensesPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 max-h-screen overflow-y-auto no-scrollbar">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>

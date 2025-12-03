@@ -13,7 +13,7 @@ export default function DashBoardLayout({ children }: dashBoardLayoutProps) {
           <Header />
           <div className="flex">
             <Sidebar />
-            <main className="flex-1 mt-8">{children}</main>
+            <main className="flex-1">{children}</main>
           </div>
         </div>
       </ProtectedRoute>

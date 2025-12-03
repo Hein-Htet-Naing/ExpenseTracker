@@ -120,3 +120,28 @@
     @apply bg-background text-foreground;
   }
 }
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .scrollbar-w-1::-webkit-scrollbar {
+    width: 2px;
+  }
+  .scrollbar-w-2::-webkit-scrollbar {
+    width: 4px;
+  }
+  .scrollbar-w-4::-webkit-scrollbar {
+    width: 8px;
+  }
+  /* Firefox */
+  .scrollbar-w-2 {
+    scrollbar-width: thin;
+  }
+  .scrollbar-w-4 {
+    scrollbar-width: auto;
+  }
+}

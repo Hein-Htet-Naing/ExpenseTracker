@@ -10,12 +10,11 @@ export const useExpenseReportByFilter = (filters: ReportFilters) => {
     enabled: !!filters,
   });
 };
-export const useExpenseReport = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (filters: ReportFilters) => reportApi.getExpenseReport(filters),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["expense-report"] }),
+export const useRecentExpense = () => {
+  return useQuery({
+    queryKey: ["expense-recent"],
+    queryFn: () => reportApi.getRecentExpense(),
+    staleTime: 5 * 60 * 1000,
   });
 };
 // console.log("startDate:" + filters.startDate);

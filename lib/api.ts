@@ -167,6 +167,10 @@ export const reportApi = {
     const response = await api.post("/report/expenses", filters);
     return response.data;
   },
+  getRecentExpense: async () => {
+    const response = await api.get("/report/expenses");
+    return response.data;
+  },
 };
 
 export default api;

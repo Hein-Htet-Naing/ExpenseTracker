@@ -36,3 +36,10 @@ export interface MonthlySpending {
   totalAmount: number;
   expensesCount: number;
 }
+export interface CategorySpending {
+  categoryName: string;
+  categoryColor: string;
+  amount: number;
+  count: number;
+  percentage: number;
+}

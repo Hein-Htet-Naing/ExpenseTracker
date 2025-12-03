@@ -84,7 +84,7 @@ export default function CategoriesPage() {
     }
   };
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 max-h-screen overflow-y-auto no-scrollbar">
       {message && (
         <div
           className={`w-full max-w-md mx-auto mb-4 p-4 text-center rounded ${

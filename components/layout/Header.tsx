@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 export const Header: React.FC = () => {
   const { logout, user } = useAuth();
   return (
-    <header className="fixed z-10 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+    <header className="w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="mx-auto container px-4 h-14 flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <div className="w-6 h-6 bg-primary rounded-full"></div>

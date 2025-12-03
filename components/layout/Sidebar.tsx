@@ -33,7 +33,7 @@ const navigation = [
 export const Sidebar = () => {
   const pathName = usePathname();
   return (
-    <aside className="overflow-hidden w-15 hover:w-64 transition duration-300 ease-in transform bg-card border-r min-h-screen mt-10 z-9 **group**">
+    <aside className="overflow-hidden w-15 hover:w-64 transition duration-300 ease-in transform bg-card border-r min-h-screen z-9 **group**">
       <nav className="p-4 space-y-2">
         {navigation.map((item, index) => {
           const isActive = pathName === item.href;

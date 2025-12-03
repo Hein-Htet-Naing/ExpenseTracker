@@ -62,19 +62,21 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
   };
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="text-lg">Report Filters</CardTitle>
         <CardDescription>
           Filter your expense data to generate specific reports
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col md:flex-row">
-        <div className="space-y-6">
+      <CardContent className="flex flex-col md:flex-row gap-4">
+        <div className="space-y-6 md:w-1/2">
           {/* Data Range */}
           <div>
-            <h4 className="text-sm font-medium mb-3">Data Range</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <h4 className="text-base font-medium text-center md:text-start">
+              Data Range
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label
                   htmlFor="startDate"
@@ -110,8 +112,10 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
 
           {/* Amount Range */}
           <div>
-            <h4 className="text-sm font-medium mb-3">Data Range</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <h4 className="text-base font-medium mb-3 text-center md:text-start">
+              Data Range
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label
                   htmlFor="startDate"
@@ -125,7 +129,7 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
                   type="number"
                   step="0.01"
                   placeholder="0.01"
-                  className="p-2"
+                  className="p-2 w-[50%]"
                   onChange={(e) =>
                     handleAmountChange("minAmount", e.target.value)
                   }
@@ -144,7 +148,7 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
                   type="number"
                   step="0.01"
                   placeholder="0.00"
-                  className="p-2"
+                  className="p-2 w-[50%]"
                   onChange={(e) =>
                     handleAmountChange("maxAmount", e.target.value)
                   }
@@ -154,22 +158,33 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
           </div>
         </div>
 
-        <div className="mt-3">
-          <div className="flex itesm-center justify-between mb-3">
-            <h4 className="text-lg font-medium">Categoires</h4>
-            <div className="space-x-2">
+        <div className="space-y-6 md:w-1/2">
+          <div className="flex items-center justify-between w-full mb-4">
+            <h4 className="text-base text-center lg:text-lg font-medium">
+              Categoires
+            </h4>
+
+            <div className="flex flex-col md:flex-row gap-1 mx-auto">
               {/* <Button type="submit" onClick={handleSubmit}>
                 Filter
               </Button> */}
-              <Button type="button" onClick={handleAllCategories}>
+              <Button
+                className="text-sm lg:text-base"
+                type="button"
+                onClick={handleAllCategories}
+              >
                 Select All
               </Button>
-              <Button type="button" onClick={handleClearAllCategories}>
+              <Button
+                className="text-sm lg:text-base"
+                type="button"
+                onClick={handleClearAllCategories}
+              >
                 Clear All
               </Button>
             </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-32 overflow-y-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-32 overflow-y-auto scrollbar-w-2">
             {categories?.map((cat) => (
               <label
                 htmlFor=""
