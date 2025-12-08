@@ -11,20 +11,20 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { useState } from "react";
-import { validateExpense } from "@/lib/validation";
+import { validateIncome } from "@/lib/validation";
 import { Button } from "../ui/button";
 import { useCategories } from "@/hooks/useCategories";
+import { IncomeFormData } from "@/types/income";
 import { CategoriesResponse } from "@/types/category";
 
-interface ExpenseFormProps {
+interface IncomeFormProps {
   initialData?: Partial<ExpenseFormData>;
-  onSubmit: (data: ExpenseFormData) => Promise<void>;
+  onSubmit: (data: IncomeFormData) => Promise<void>;
   onCancel?: () => void;
   isLoading?: boolean;
   isEdit?: boolean;
 }
-
-export const Expenseform: React.FC<ExpenseFormProps> = ({
+export const Incomeform: React.FC<IncomeFormProps> = ({
   initialData,
   onSubmit,
   isLoading,
@@ -32,15 +32,17 @@ export const Expenseform: React.FC<ExpenseFormProps> = ({
   onCancel,
 }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [formData, setFormData] = useState<ExpenseFormData>({
+  const [formData, setFormData] = useState<IncomeFormData>({
     title: "",
     amount: 0,
     categoryId: "",
-    description: "",
+    source: "",
     date: new Date().toISOString().split("T")[0],
+    description: "",
     ...initialData,
   });
   const { data: categories } = useCategories<CategoriesResponse>();
+  // console.log(categories?.incomeCategories);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -63,9 +65,9 @@ export const Expenseform: React.FC<ExpenseFormProps> = ({
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const validateExpenseError = validateExpense(formData);
-    if (Object.keys(validateExpenseError).length > 0) {
-      setErrors(validateExpenseError);
+    const validateIncomeError = validateIncome(formData);
+    if (Object.keys(validateIncomeError).length > 0) {
+      setErrors(validateIncomeError);
       return;
     }
     try {
@@ -74,7 +76,7 @@ export const Expenseform: React.FC<ExpenseFormProps> = ({
       setErrors({
         submit:
           error.response?.data?.message ||
-          "Failed to save expense. Please try again.",
+          "Failed to save income. Please try again.",
       });
     }
   };
@@ -91,10 +93,10 @@ export const Expenseform: React.FC<ExpenseFormProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{!isEdit ? "Add New Expense" : " Edit Expense"} </CardTitle>
+        <CardTitle>{!isEdit ? "Add New Income" : " Edit Income"} </CardTitle>
         <CardDescription>
           {!isEdit
-            ? "Enter the details of your new expense"
+            ? "Enter the details of your new income"
             : "Enter the details of a expense"}
         </CardDescription>
       </CardHeader>
@@ -102,14 +104,14 @@ export const Expenseform: React.FC<ExpenseFormProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="title" className="text-sm font-medium">
-              Expense Title
+              Income Title
             </Label>
             <Input
               id="title"
               name="title"
               type="text"
               value={formData.title || ""}
-              placeholder="e.g., Groceries, Movie Tickets, etc."
+              placeholder="e.g., Monthly Salary, Freelance Payment, etc."
               onChange={handleChange}
             />
             {errors.title && (
@@ -147,13 +149,14 @@ export const Expenseform: React.FC<ExpenseFormProps> = ({
               <select
                 id="categoryId"
                 name="categoryId"
+                value={formData.categoryId}
                 onChange={handleChange}
                 className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none 
                   focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 
                 }${errors.category ? "border-destructive" : ""}`}
               >
                 <option value="">Select a category</option>
-                {categories?.expenseCategories?.map((category) => (
+                {categories?.incomeCategories?.map((category) => (
                   <option key={category._id} value={category._id}>
                     {category.name}
                   </option>
@@ -165,20 +168,37 @@ export const Expenseform: React.FC<ExpenseFormProps> = ({
             </div>
           </div>
           {/* Date */}
-          <div className="space-y-2">
-            <label htmlFor="date" className="text-sm font-medium">
-              Date *
-            </label>
-            <Input
-              id="date"
-              name="date"
-              type="date"
-              value={formData.date.split("T")[0]}
-              onChange={handleChange}
-            />
-            {errors.date && (
-              <p className="text-sm text-destructive">{errors.date}</p>
-            )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label htmlFor="source" className="text-sm font-medium">
+                Source (Optional)
+              </label>
+              <Input
+                id="source"
+                name="source"
+                type="text"
+                placeholder="e.g., Company Name, Client Name"
+                value={formData.source || ""}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="date" className="text-sm font-medium">
+                Date *
+              </label>
+              <Input
+                id="date"
+                name="date"
+                type="date"
+                value={formData.date}
+                onChange={handleChange}
+                className={errors.date ? "border-destructive" : ""}
+              />
+              {errors.date && (
+                <p className="text-sm text-destructive">{errors.date}</p>
+              )}
+            </div>
           </div>
           {/* Categoreis */}
           <div>
@@ -189,7 +209,7 @@ export const Expenseform: React.FC<ExpenseFormProps> = ({
               id="description"
               name="description"
               value={formData.description || ""}
-              placeholder="Add any additional details about this expense..."
+              placeholder="Add any additional details about this income..."
               onChange={handleChange}
               rows={3}
             ></Textarea>
@@ -202,9 +222,9 @@ export const Expenseform: React.FC<ExpenseFormProps> = ({
                   {isEdit ? "Updating..." : "Adding..."}
                 </>
               ) : isEdit ? (
-                "Update Expense"
+                "Update Income"
               ) : (
-                " Add Expense"
+                " Add Income"
               )}
             </Button>
             <Button

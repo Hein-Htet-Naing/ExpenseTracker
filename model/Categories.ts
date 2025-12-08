@@ -5,6 +5,7 @@ interface ICategories extends Document {
   description?: string;
   color: string;
   userId: Types.ObjectId;
+  types: "expense" | "income" | "both";
   createdAt: string;
   updatedAt: string;
   deletedAt?: string;
@@ -29,6 +30,12 @@ const categoriesSchema = new Schema<ICategories>({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
+  },
+  types: {
+    type: String,
+    enum: ["expense", "income", "both"],
+    required: true,
+    default: "expense",
   },
   deletedAt: {
     type: Date,

@@ -17,12 +17,20 @@ export async function PUT(
       { status: 400 }
     );
   }
-  const { name, color, description } = await request.json();
+  const { name, color, description, types } = await request.json();
 
   try {
     await CategoriesModel.findByIdAndUpdate(
       { _id: id },
-      { $set: { name: name, color: color, description: description } },
+      {
+        $set: {
+          name: name,
+          color: color,
+          description: description,
+          types: types,
+          updatedAt: new Date(),
+        },
+      },
       { new: true }
     );
     return NextResponse.json({

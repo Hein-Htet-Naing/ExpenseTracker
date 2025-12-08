@@ -14,12 +14,15 @@ import { useEffect, useState } from "react";
 import { useFeedBackStore } from "@/app/store/feedBackstore";
 import { DeleteCategoriesMutation, useCategories } from "@/hooks/useCategories";
 import { CategoriesListSkeleton } from "@/components/skeleton/category/categoryListSkeleton";
-
-//need to add Edit and Delete functionality
+import { CategoriesResponse } from "@/types/category";
 
 export default function CategoriesPage() {
   const { message, type, clearFeedback } = useFeedBackStore();
-  const { data: categories, isPending, error } = useCategories();
+  const {
+    data: categories,
+    isPending,
+    error,
+  } = useCategories<CategoriesResponse>();
   const deleteMutation = DeleteCategoriesMutation();
   const [searchTerm, setSearchTerm] = useState<string>("");
   useEffect(() => {
@@ -34,7 +37,8 @@ export default function CategoriesPage() {
       </>
     );
   }
-  const filterCategories = categories?.filter(
+
+  const filterCategories = categories?.categories?.filter(
     (category) =>
       category.name
         .toLocaleLowerCase()
@@ -148,7 +152,7 @@ export default function CategoriesPage() {
               )}
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5 max-h-125 overflow-y-auto">
               {filterCategories?.map((category) => (
                 <Card key={category._id}>
                   <CardContent>

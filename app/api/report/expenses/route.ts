@@ -152,8 +152,8 @@ export async function GET(request: NextRequest) {
         $unwind: { path: "$categoryDetails", preserveNullAndEmptyArrays: true },
       },
     ]);
-    console.log("recent Expenses");
-    console.log(getRecentExpense);
+    // console.log("recent Expenses");
+    // console.log(getRecentExpense);
 
     return NextResponse.json({
       success: true,

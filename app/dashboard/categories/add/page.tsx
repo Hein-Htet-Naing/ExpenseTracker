@@ -13,6 +13,7 @@ export default function AddCategoryPage() {
 
   const handleAddCategoriesSubmit = async (data: CategoryFormData) => {
     setloading(true);
+    console.log(data);
     try {
       const res = await createCategorymutation.mutateAsync(data);
       useFeedBackStore
@@ -31,7 +32,7 @@ export default function AddCategoryPage() {
   };
   return (
     <>
-      <div className="p-6">
+      <div className="px-6 py-4 max-h-screen overflow-y-auto no-scrollbar">
         <div className="max-w-4xl mx-auto">
           <div className="mb-6">
             <h1 className="text-3xl font-bold tracking-tight">

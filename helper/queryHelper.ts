@@ -211,5 +211,14 @@ export function buildExpenseQueryAndPipeline({
     },
   ];
   //percentage = ($cs.amount / grandTotalCategoryExpense ) x 100
+
+  const recentExpense = [
+    {
+      $match: match,
+    },
+    {
+      $sort: { createdAt: -1 },
+    },
+  ];
   return { pipeline, MonthlySpendingPipeline, CategoriesSpending };
 }

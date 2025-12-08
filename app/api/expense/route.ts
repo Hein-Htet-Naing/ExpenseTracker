@@ -100,6 +100,7 @@ export async function GET(request: Request) {
       },
     });
   } catch (error: any) {
+    console.log("Expense" + error);
     return NextResponse.json(
       {
         success: false,

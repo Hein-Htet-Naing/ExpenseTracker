@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 export interface jwtPayLoad {
   id: string;
   email: string;
@@ -29,6 +29,19 @@ export const verifyRefreshToken = (token: string): jwtPayLoad | null => {
   try {
     return jwt.verify(token, JWT_REFRESH_KEY!) as jwtPayLoad;
   } catch (error) {
+    return null;
+  }
+};
+
+export const getToken = async () => {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  if (!token) return null;
+  try {
+    const decoded = verifyToken(token);
+    return decoded?.id ?? null;
+  } catch (error: any) {
+    console.error("Token verification failed:", error);
     return null;
   }
 };

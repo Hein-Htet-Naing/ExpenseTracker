@@ -1,19 +1,20 @@
 import { categoryAPI } from "@/lib/api";
-import { CategoryFormData, CategoryResponse } from "@/types/category";
+import { CategoryFormData } from "@/types/category";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export const useCategories = () => {
-  return useQuery({
+export const useCategories = <T = any>() => {
+  return useQuery<T>({
     queryKey: ["categories"],
     queryFn: categoryAPI.getAll,
     staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: true,
   });
 };
 
 export const useCreateCategories = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: categoryAPI.create,
+    mutationFn: (data: CategoryFormData) => categoryAPI.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
@@ -49,6 +50,7 @@ export const DeleteCategoriesMutation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       queryClient.invalidateQueries({ queryKey: ["expensesWithCategories"] });
+      queryClient.invalidateQueries({ queryKey: ["incomesWithCategories"] });
     },
   });
 };

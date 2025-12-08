@@ -2,8 +2,10 @@
 import {
   LayoutDashboard,
   CircleDollarSign,
-  FileChartColumnIncreasing,
+  Banknote,
   Grid2X2,
+  PiggyBank,
+  ChartCandlestick,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -19,6 +21,7 @@ const navigation = [
     href: "/dashboard/expenses",
     icon: <CircleDollarSign />,
   },
+  { name: "Income", href: "/dashboard/income", icon: <PiggyBank /> },
   {
     name: "Categories",
     href: "/dashboard/categories",
@@ -27,13 +30,14 @@ const navigation = [
   {
     name: "Reports",
     href: "/dashboard/reports",
-    icon: <FileChartColumnIncreasing />,
+    icon: <ChartCandlestick />,
   },
+  { name: "Budget", href: "/dashboard/budget", icon: <Banknote /> },
 ];
 export const Sidebar = () => {
   const pathName = usePathname();
   return (
-    <aside className="overflow-hidden w-15 hover:w-64 transition duration-300 ease-in transform bg-card border-r min-h-screen z-9 **group**">
+    <aside className="overflow-hidden w-16 hover:w-64 transition duration-300 ease-in transform bg-card border-r min-h-screen **group**">
       <nav className="p-4 space-y-2">
         {navigation.map((item, index) => {
           const isActive = pathName === item.href;

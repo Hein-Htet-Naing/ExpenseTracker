@@ -4,6 +4,7 @@ import { verifyToken } from "@/lib/jwt";
 import { NextResponse } from "next/server";
 import { CategoriesModel } from "@/model/Categories";
 import mongoose from "mongoose";
+import { validateCategoreis } from "@/lib/validation";
 export async function GET() {
   await connectDB();
 
@@ -26,14 +27,23 @@ export async function GET() {
     );
   }
   try {
+    const expenseCategories = await CategoriesModel.find({
+      userId,
+      types: "expense",
+      deletedAt: null,
+    });
+    const incomeCategories = await CategoriesModel.find({
+      userId,
+      types: "income",
+      deletedAt: null,
+    });
     const categories = await CategoriesModel.find({
       userId,
       deletedAt: null,
     });
-
     return NextResponse.json({
       success: true,
-      data: categories,
+      data: { categories, expenseCategories, incomeCategories },
     });
   } catch (error: any) {
     return NextResponse.json(
@@ -55,6 +65,10 @@ export async function GET() {
 //     $set: { deletedAt: null },
 //   }
 // );
+//  const update = await CategoriesModel.updateMany(
+//     {},
+//     { $set: { types: "expense" } }
+//   );
 export async function POST(request: Request) {
   try {
     // Connect to DB with error handling
@@ -85,17 +99,28 @@ export async function POST(request: Request) {
       { status: 403 }
     );
   }
-  const { name, description, color } = await request.json();
+  const { name, description, color, types } = await request.json();
   const normalizedCategoryName = name.toLowerCase().trim();
+  //before adding validate the data
+  //added later here
+  const validateData = validateCategoreis({ name, color, types, description });
+  if (Object.keys(validateData).length > 0) {
+    return NextResponse.json({
+      success: false,
+      message: "Invalid Data!",
+    });
+  }
+
   //add New Category
   try {
-    await CategoriesModel.create({
+    const res = await CategoriesModel.create({
       name: normalizedCategoryName,
       description: description,
       color: color,
+      types: types,
       userId: mongoose.Types.ObjectId.createFromHexString(userId!),
     });
-
+    console.log(res);
     return NextResponse.json({
       success: true,
       message: "New Category Added Successfully",

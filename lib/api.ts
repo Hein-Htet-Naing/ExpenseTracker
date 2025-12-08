@@ -2,8 +2,13 @@ import { AuthResponse, LoginFormData, RegisterFormData } from "@/types/auth";
 import { ExpenseFormData, ExpenseRespone } from "@/types/expense";
 import axios from "axios";
 import { Expense } from "@/types/expense";
-import { Category, CategoryFormData, CategoryResponse } from "@/types/category";
+import { CategoryFormData, CategoryResponse } from "@/types/category";
 import { ReportFilters } from "@/types/report";
+import {
+  IncomeFormData,
+  IncomeResponse,
+  IncomeWithCategoreisResponse,
+} from "@/types/income";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -101,7 +106,7 @@ export const expenseAPI = {
 };
 
 export const categoryAPI = {
-  getAll: async (): Promise<Category[]> => {
+  getAll: async () => {
     try {
       const response = await api.get("/categories");
       //return response.data.data = categories array
@@ -169,6 +174,43 @@ export const reportApi = {
   },
   getRecentExpense: async () => {
     const response = await api.get("/report/expenses");
+    return response.data;
+  },
+};
+
+export const incomeApi = {
+  getAll: async (
+    page: number,
+    limit: number,
+    search?: string | null,
+    category?: string | null
+  ): Promise<IncomeWithCategoreisResponse> => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    if (search) params.set("search", search);
+    if (category && category !== "All") params.set("category", category);
+    const response = await api.get(`/incomes?${params.toString()}`);
+    return response.data;
+  },
+
+  create: async (data: IncomeFormData): Promise<IncomeResponse> => {
+    //remember to catch error
+    const response = await api.post("/incomes", data);
+    return response.data;
+  },
+  getById: async (id: string): Promise<IncomeResponse> => {
+    const response = await api.get(`/incomes/getById/${id}`);
+    return response.data;
+  },
+  update: async (id: string, data: IncomeFormData): Promise<IncomeResponse> => {
+    const response = await api.put(`/incomes/${id}`, data);
+    return response.data;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/incomes/${id}`);
+    console.log(response);
     return response.data;
   },
 };

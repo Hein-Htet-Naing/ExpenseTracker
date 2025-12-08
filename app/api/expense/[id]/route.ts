@@ -18,6 +18,7 @@ export async function PUT(
           category: category,
           date: date,
           description: description,
+          updatedAt: new Date(),
         },
       },
       {

@@ -6,7 +6,11 @@ import {
   Pizza,
   Boxes,
   HandCoins,
+  BanknoteArrowUp,
   Clapperboard,
+  CreditCard,
+  WalletMinimal,
+  Gem,
 } from "lucide-react";
 export const icons = [
   {
@@ -17,6 +21,10 @@ export const icons = [
     dining: <Pizza />,
     utilities: <Boxes />,
     entertainment: <Clapperboard />,
+    salary: <WalletMinimal />,
+    bonus: <BanknoteArrowUp />,
+    freelance: <CreditCard />,
+    investment: <Gem />,
     other: <HandCoins />,
   },
 ];

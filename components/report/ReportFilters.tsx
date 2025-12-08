@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "../ui/card";
 import { useCategories } from "@/hooks/useCategories";
+import { CategoriesResponse } from "@/types/category";
 interface ReportFiltersProps {
   filters: ReportFiltersType;
   onFilterChange: (filters: ReportFiltersType) => void;
@@ -19,7 +20,7 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
   onFilterChange,
   onReset,
 }) => {
-  const { data: categories } = useCategories();
+  const { data: categories } = useCategories<CategoriesResponse>();
   const handleDateChange = (field: "startDate" | "endDate", value: string) => {
     onFilterChange({
       ...filters,
@@ -51,7 +52,7 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
   const handleAllCategories = () => {
     onFilterChange({
       ...filters,
-      categoryIds: categories?.map((cat) => cat._id),
+      categoryIds: categories?.categories?.map((cat) => cat._id),
     });
   };
   const handleClearAllCategories = () => {
@@ -184,8 +185,9 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
               </Button>
             </div>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-32 overflow-y-auto scrollbar-w-2">
-            {categories?.map((cat) => (
+            {categories?.categories?.map((cat) => (
               <label
                 htmlFor=""
                 key={cat._id}

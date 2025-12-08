@@ -18,6 +18,7 @@ import { Expense } from "@/types/expense";
 import { useCategories } from "@/hooks/useCategories";
 import { useExpensesWithCategories } from "@/hooks/useExpenses";
 import { ExpensesSkeleton } from "@/components/skeleton/expense/expenseListSkeleton";
+import { CategoriesResponse } from "@/types/category";
 export default function ExpensesPage() {
   const [page, setPage] = useState<number>(1);
   const [expense, setExpense] = useState<Expense[]>([]);
@@ -26,7 +27,7 @@ export default function ExpensesPage() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   //fetch expenses with categories
-  const { data: categories } = useCategories();
+  const { data: categories } = useCategories<CategoriesResponse>();
   const { data: expensesWithCategories, isPending } = useExpensesWithCategories(
     page,
     5
@@ -163,7 +164,7 @@ export default function ExpensesPage() {
                 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 <option value="All">All Categories</option>
-                {categories?.map((category) => (
+                {categories?.categories?.map((category) => (
                   <option key={category._id} value={category._id}>
                     {category.name}
                   </option>
@@ -224,7 +225,7 @@ export default function ExpensesPage() {
                       <div>
                         <p className="font-medium">{expense.title}</p>
                         <p className="text-sm text-muted-foreground">
-                          {expense?.categoryDetails?.name} •{" "}
+                          {expense?.categoryDetails?.name}
                           {new Date(expense.date).toLocaleDateString()}
                         </p>
                         {expense.description && (

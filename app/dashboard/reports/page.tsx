@@ -104,7 +104,7 @@ export default function ReaportPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div>
+            <div className="space-y-6">
               {recentExpense?.data?.length > 0 ? (
                 recentExpense?.data?.map((expense: Expense) => {
                   return (

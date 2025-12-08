@@ -12,19 +12,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { validateCategoreis } from "@/lib/validation";
 import { Textarea } from "../ui/textarea";
-const colorOptions = [
-  { value: "#3b82f6", label: "Blue" },
-  { value: "#ef4444", label: "Red" },
-  { value: "#10b981", label: "Green" },
-  { value: "#f59e0b", label: "Yellow" },
-  { value: "#8b5cf6", label: "Purple" },
-  { value: "#ec4899", label: "Pink" },
-  { value: "#06b6d4", label: "Cyan" },
-  { value: "#f97316", label: "Orange" },
-  { value: "#64748b", label: "Gray" },
-  { value: "#84cc16", label: "Lime" },
-];
-
+import { colorOptions } from "../ui/colorPalette";
 interface CategoryFormProps {
   initialData?: Partial<CategoryFormData>;
   isEdit?: boolean;
@@ -44,12 +32,15 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     name: "",
     description: "",
     color: "",
+    types: "",
     ...initialData,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev: CategoryFormData) => ({
@@ -66,8 +57,9 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
     if (Object.keys(validateErrors).length > 0) {
       setErrors(validateErrors);
     }
+
     //only run submit if no errors
-    if (Object.keys(validateErrors).length === 0) {
+    if (Object.keys(validateErrors).length == 0) {
       try {
         await onSubmit(formData);
       } catch (error: any) {
@@ -82,8 +74,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
 
   return (
     <>
-      {isLoading && <></>}
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full max-w-lg mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl">
             {!isEdit ? "Create Category" : "Edit Category"}
@@ -112,12 +103,34 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
                 <p className="text-sm text-destructive w-full">{errors.name}</p>
               )}
             </div>
+            <div className="space-y-2">
+              <label htmlFor="types" className="text-sm font-medium">
+                Type*
+              </label>
+              <select
+                name="types"
+                id="types"
+                value={formData.types || ""}
+                onChange={handleChange}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none 
+                  focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+              >
+                <option value="">Select a type</option>
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+              {errors.types && (
+                <p className="text-sm text-destructive w-full">
+                  {errors.types}
+                </p>
+              )}
+            </div>
             {/* color */}
             <div className="space-y-2">
               <label htmlFor="color" className="text-sm font-medium">
                 Color*
               </label>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2">
                 {colorOptions.map((color) => (
                   <Button
                     key={color.label}
@@ -164,7 +177,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
                 ) : isEdit ? (
                   "Update Category"
                 ) : (
-                  "Creae Category"
+                  "Create Category"
                 )}
               </Button>
               <Button
