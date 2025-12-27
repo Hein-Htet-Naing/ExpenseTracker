@@ -13,6 +13,8 @@ import { CategoriesResponse } from "@/types/category";
 interface ReportFiltersProps {
   filters: ReportFiltersType;
   onFilterChange: (filters: ReportFiltersType) => void;
+  reportType?: "all" | "income" | "expenses";
+  onReportTypeChange?: (type: "all" | "income" | "expenses") => void;
   onReset: () => void;
 }
 export const ReportFilters: React.FC<ReportFiltersProps> = ({
@@ -48,17 +50,29 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
       categoryIds: newCategoriesId.length > 0 ? newCategoriesId : undefined,
     });
   };
+  const handleIncomeCategory = (IcategoryId: string, checked: boolean) => {
+    const currentCatgId = filters.IcategoryIds || [];
+    const newCatgId = checked
+      ? [...currentCatgId, IcategoryId]
+      : currentCatgId.filter((id) => id !== IcategoryId);
+    onFilterChange({
+      ...filters,
+      IcategoryIds: newCatgId.length > 0 ? newCatgId : undefined,
+    });
+  };
 
   const handleAllCategories = () => {
     onFilterChange({
       ...filters,
-      categoryIds: categories?.categories?.map((cat) => cat._id),
+      categoryIds: categories?.expenseCategories?.map((cat) => cat._id),
+      IcategoryIds: categories?.incomeCategories?.map((cat) => cat._id),
     });
   };
   const handleClearAllCategories = () => {
     onFilterChange({
       ...filters,
       categoryIds: [],
+      IcategoryIds: [],
     });
   };
 
@@ -67,15 +81,15 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
       <CardHeader>
         <CardTitle className="text-lg">Report Filters</CardTitle>
         <CardDescription>
-          Filter your expense data to generate specific reports
+          Filter your financial data to generate specific reports
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col md:flex-row gap-4">
-        <div className="space-y-6 md:w-1/2">
-          {/* Data Range */}
+        <div className="space-y-6 md:w-1/3">
+          {/* Date Range */}
           <div>
             <h4 className="text-base font-medium text-center md:text-start">
-              Data Range
+              Date Range
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -114,7 +128,7 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
           {/* Amount Range */}
           <div>
             <h4 className="text-base font-medium mb-3 text-center md:text-start">
-              Data Range
+              Amount Range
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -159,16 +173,13 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
           </div>
         </div>
 
-        <div className="space-y-6 md:w-1/2">
+        <div className="space-y-6 md:w-2/3">
           <div className="flex items-center justify-between w-full mb-4">
             <h4 className="text-base text-center lg:text-lg font-medium">
               Categoires
             </h4>
 
             <div className="flex flex-col md:flex-row gap-1 mx-auto">
-              {/* <Button type="submit" onClick={handleSubmit}>
-                Filter
-              </Button> */}
               <Button
                 className="text-sm lg:text-base"
                 type="button"
@@ -185,24 +196,49 @@ export const ReportFilters: React.FC<ReportFiltersProps> = ({
               </Button>
             </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-32 overflow-y-auto scrollbar-w-2">
-            {categories?.categories?.map((cat) => (
-              <label
-                htmlFor=""
-                key={cat._id}
-                className="flex items-center justify-start gap-2"
-              >
-                <Input
-                  type="checkbox"
-                  className="rounded w-4 h-4 border-gray-300"
-                  onChange={(e) =>
-                    handleCategoryChange(cat._id, e.target.checked)
-                  }
-                ></Input>
-                <span className="">{cat.name}</span>
-              </label>
-            ))}
+          <div className="space-x-8 flex flex-col w-full lg:flex-row">
+            <div>
+              <h4 className="text-base font-medium mb-3">Expense Category</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-32 overflow-y-auto scrollbar-w-2">
+                {categories?.expenseCategories?.map((cat) => (
+                  <label
+                    key={cat._id}
+                    className="flex items-center justify-start gap-2"
+                  >
+                    <Input
+                      type="checkbox"
+                      className="rounded w-4 h-4 border-gray-300"
+                      checked={filters.categoryIds?.includes(cat._id) || false}
+                      onChange={(e) =>
+                        handleCategoryChange(cat._id, e.target.checked)
+                      }
+                    ></Input>
+                    <span className="">{cat.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h4 className="text-base font-medium mb-3">Income Category</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-32 overflow-y-auto scrollbar-w-2">
+                {categories?.incomeCategories?.map((cat) => (
+                  <label
+                    key={cat._id}
+                    className="flex items-center justify-start gap-2"
+                  >
+                    <Input
+                      type="checkbox"
+                      className="rounded w-4 h-4 border-gray-300"
+                      checked={filters.IcategoryIds?.includes(cat._id) || false}
+                      onChange={(e) =>
+                        handleIncomeCategory(cat._id, e.target.checked)
+                      }
+                    ></Input>
+                    <span className="">{cat.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </CardContent>

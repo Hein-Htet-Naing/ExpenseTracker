@@ -6,27 +6,31 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { ReportFilters as ReportFiltersType } from "@/types/report";
 import { ReportFilters } from "@/components/report/ReportFilters";
-import { ExpenseSummaryCards } from "@/components/report/ExpenseSummary";
+import { FinancialSummaryCards } from "@/components/report/FinancialSummary";
 import { useExpenseReportByFilter, useRecentExpense } from "@/hooks/useReports";
 import { MonthlySpendingChart } from "@/components/report/MonthlySpendingChart";
 import { CategorySpendingChart } from "@/components/report/CategorySpendingChart";
 import { Button } from "@/components/ui/button";
 import { Expense } from "@/types/expense";
 import { icons } from "@/components/ui/icon";
+import { IncomeVsExpensesChart } from "@/components/report/IncomeVsExpenseChart";
+import { IncomeByCategoryChart } from "@/components/report/incomeByCategory";
+import IncomeSkeleton from "@/components/skeleton/income/incomeListSkeleton";
+import { ExpensesSkeleton } from "@/components/skeleton/expense/expenseListSkeleton";
+
 export default function ReaportPage() {
   const [filters, setFilters] = useState<ReportFiltersType>({});
   const {
-    data: expenseSummaryCards,
+    data: SummaryCards,
     isPending,
     isError,
   } = useExpenseReportByFilter(filters);
-  const { data: recentExpense, isLoading } = useRecentExpense();
-  // console.log(recentExpense);
-  // console.log(expenseSummaryCards?.data?.monthlyBreakDown);
-  // console.log(expenseSummaryCards);
+  const { data: recentExpenseAndIncome } = useRecentExpense();
+  // console.log(SummaryCards?.data?.incomeVsExpenseSummary);
+  // console.log(recentExpenseAndIncome);
   const handleFiltersChange = (newFilters: ReportFiltersType) => {
     setFilters(newFilters);
   };
@@ -59,10 +63,10 @@ export default function ReaportPage() {
         <div className="flex flex-col items-center md:items-start gap-4 ">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              Expense Reports
+              Financial Reports
             </h1>
             <p className="text-muted-foreground">
-              Analyze your spending patterns and trends
+              Analyze your complete financial picture
             </p>
           </div>
         </div>
@@ -74,92 +78,166 @@ export default function ReaportPage() {
         {isPending && (
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="ml-2">Generating report...</span>
+            <span className="ml-2">Please wait! Generating report...</span>
           </div>
         )}
 
         {/* flex flex-col lg:flex-row gap-4 m-4 */}
-        {!isPending && expenseSummaryCards?.success && (
+        {!isPending && SummaryCards?.success && (
           <>
-            <ExpenseSummaryCards summary={expenseSummaryCards.data.summary} />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FinancialSummaryCards
+              summary={SummaryCards.data.summary}
+              incomeSummary={SummaryCards.data.incomeSummary}
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <CategorySpendingChart
-                categorySpending={
-                  expenseSummaryCards?.data?.categoryBreakDown ?? []
-                }
+                categorySpending={SummaryCards?.data?.categoryBreakDown ?? []}
               />
               <MonthlySpendingChart
-                monthlySpending={
-                  expenseSummaryCards?.data?.monthlyBreakDown ?? []
-                }
+                monthlySpending={SummaryCards?.data?.monthlyBreakDown ?? []}
+              />
+              <IncomeByCategoryChart
+                data={SummaryCards?.data?.incomeByCategories ?? []}
               />
             </div>
+
+            <IncomeVsExpensesChart
+              data={SummaryCards?.data?.incomeVsExpenseSummary ?? []}
+              incomeByMonthly={SummaryCards?.data?.incomebyMonthly ?? []}
+            />
           </>
         )}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Expenses</CardTitle>
-            <CardDescription>
-              Latest expense transactions included in this report
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {recentExpense?.data?.length > 0 ? (
-                recentExpense?.data?.map((expense: Expense) => {
-                  return (
-                    <div
-                      key={expense._id}
-                      className="flex items-center justify-between p-3 border rounded-lg gap-3"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-3 h-3 rounded-full" />
-                        {icons.map((icon, index) => (
-                          <div
-                            key={index}
-                            style={{
-                              backgroundColor:
-                                expense.categoryDetails?.color || "#ccc",
-                            }}
-                            className="p-2 rounded-full"
-                          >
-                            {
-                              icon[
-                                expense.categoryDetails
-                                  ?.name as keyof typeof icon
-                              ]
-                            }
-                            {expense?.categoryDetails?.name &&
-                              !(expense?.categoryDetails?.name in icon) &&
-                              icon.other}
+        <Suspense fallback={<ExpensesSkeleton />}>
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Expenses</CardTitle>
+              <CardDescription>
+                Latest expense transactions included in this report
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {recentExpenseAndIncome?.data?.length > 0 ? (
+                  recentExpenseAndIncome?.data?.map((expense: Expense) => {
+                    return (
+                      <div
+                        key={expense._id}
+                        className="flex items-center justify-between p-3 border rounded-lg gap-3"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 rounded-full" />
+                          {icons.map((icon, index) => (
+                            <div
+                              key={index}
+                              style={{
+                                backgroundColor:
+                                  expense.categoryDetails?.color || "#ccc",
+                              }}
+                              className="p-2 rounded-full"
+                            >
+                              {
+                                icon[
+                                  expense.categoryDetails
+                                    ?.name as keyof typeof icon
+                                ]
+                              }
+                              {expense?.categoryDetails?.name &&
+                                !(expense?.categoryDetails?.name in icon) &&
+                                icon.other}
+                            </div>
+                          ))}
+                          <div>
+                            <p className="font-medium">{expense.title}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {expense.categoryDetails?.name}
+                              {new Date(expense.date).toLocaleDateString()}
+                            </p>
                           </div>
-                        ))}
-                        <div>
-                          <p className="font-medium">{expense.title}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {expense.categoryDetails?.name}
-                            {new Date(expense.date).toLocaleDateString()}
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium">
+                            ${expense.amount.toFixed(2)}
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-medium">
-                          ${expense.amount.toFixed(2)}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <p className="text-muted-foreground text-center py-4">
-                  No Recent Expenses Found
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {!isPending && (!expenseSummaryCards?.success || isError) && (
+                    );
+                  })
+                ) : (
+                  <p className="text-muted-foreground text-center py-4">
+                    No Recent Expenses Found
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </Suspense>
+        <Suspense fallback={<IncomeSkeleton />}>
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Incomes</CardTitle>
+              <CardDescription>
+                Latest Income transactions included in this report
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {recentExpenseAndIncome?.recentIncome?.length > 0 ? (
+                  recentExpenseAndIncome?.recentIncome?.map(
+                    (expense: Expense) => {
+                      return (
+                        <div
+                          key={expense._id}
+                          className="flex items-center justify-between p-3 border rounded-lg gap-3"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-3 h-3 rounded-full" />
+                            {icons.map((icon, index) => (
+                              <div
+                                key={index}
+                                style={{
+                                  backgroundColor:
+                                    expense.categoryDetails?.color || "#ccc",
+                                }}
+                                className="p-2 rounded-full"
+                              >
+                                {
+                                  icon[
+                                    expense.categoryDetails
+                                      ?.name as keyof typeof icon
+                                  ]
+                                }
+                                {expense?.categoryDetails?.name &&
+                                  !(expense?.categoryDetails?.name in icon) &&
+                                  icon.other}
+                              </div>
+                            ))}
+                            <div>
+                              <p className="font-medium">{expense.title}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {expense.categoryDetails?.name}
+                                {new Date(expense.date).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium">
+                              ${expense.amount.toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+                  )
+                ) : (
+                  <p className="text-muted-foreground text-center py-4">
+                    No Recent Expenses Found
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </Suspense>
+        {!isPending && (!SummaryCards?.success || isError) && (
           <Card>
             <CardContent className="text-center py-8">
               <p className="text-muted-foreground">
@@ -172,3 +250,58 @@ export default function ReaportPage() {
     </>
   );
 }
+// <div className="space-y-6 w-full lg:w-1/2">
+//           {recentExpenseAndIncome?.recentIncome?.length > 0 ? (
+//             recentExpenseAndIncome?.recentIncome?.map(
+//               (expense: Expense) => {
+//                 return (
+//                   <div
+//                     key={expense._id}
+//                     className="flex items-center justify-between p-3 border rounded-lg gap-3"
+//                   >
+//                     <div className="flex items-center space-x-3">
+//                       <div className="w-3 h-3 rounded-full" />
+//                       {icons.map((icon, index) => (
+//                         <div
+//                           key={index}
+//                           style={{
+//                             backgroundColor:
+//                               expense.categoryDetails?.color || "#ccc",
+//                           }}
+//                           className="p-2 rounded-full"
+//                         >
+//                           {
+//                             icon[
+//                               expense.categoryDetails
+//                                 ?.name as keyof typeof icon
+//                             ]
+//                           }
+//                           {expense?.categoryDetails?.name &&
+//                             !(expense?.categoryDetails?.name in icon) &&
+//                             icon.other}
+//                         </div>
+//                       ))}
+//                       <div>
+//                         <p className="font-medium">{expense.title}</p>
+//                         <p className="text-sm text-muted-foreground">
+//                           {expense.categoryDetails?.name}
+
+//                           {new Date(expense.date).toLocaleDateString()}
+//                         </p>
+//                       </div>
+//                     </div>
+//                     <div className="text-right">
+//                       <p className="font-medium">
+//                         ${expense.amount.toFixed(2)}
+//                       </p>
+//                     </div>
+//                   </div>
+//                 );
+//               }
+//             )
+//           ) : (
+//             <p className="text-muted-foreground text-center py-4">
+//               No Recent Expenses Found
+//             </p>
+//           )}
+//         </div>

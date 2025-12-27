@@ -1,11 +1,11 @@
 import { ReportFilters } from "@/types/report";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { reportApi } from "@/lib/api";
 export const useExpenseReportByFilter = (filters: ReportFilters) => {
   const serializedfilter = filters ? JSON.stringify(filters) : undefined;
   return useQuery({
     queryKey: ["expense-report", serializedfilter],
-    queryFn: () => reportApi.getExpenseReport(filters),
+    queryFn: () => reportApi.getReport(filters),
     staleTime: 5 * 60 * 1000,
     enabled: !!filters,
   });
@@ -13,7 +13,7 @@ export const useExpenseReportByFilter = (filters: ReportFilters) => {
 export const useRecentExpense = () => {
   return useQuery({
     queryKey: ["expense-recent"],
-    queryFn: () => reportApi.getRecentExpense(),
+    queryFn: () => reportApi.getRecentData(),
     staleTime: 5 * 60 * 1000,
   });
 };

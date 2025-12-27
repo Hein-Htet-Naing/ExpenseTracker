@@ -168,12 +168,12 @@ export const categoryAPI = {
 };
 
 export const reportApi = {
-  getExpenseReport: async (filters: ReportFilters) => {
-    const response = await api.post("/report/expenses", filters);
+  getReport: async (filters: ReportFilters) => {
+    const response = await api.post("/report", filters);
     return response.data;
   },
-  getRecentExpense: async () => {
-    const response = await api.get("/report/expenses");
+  getRecentData: async () => {
+    const response = await api.get("/report");
     return response.data;
   },
 };

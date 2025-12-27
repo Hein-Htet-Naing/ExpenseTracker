@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       email: normalizeEmail,
       password: hashPw,
     });
-    await addNewUser.save();
+    // await addNewUser.save();
     return NextResponse.json({
       success: true,
       user: {

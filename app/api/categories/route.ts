@@ -41,6 +41,7 @@ export async function GET() {
       userId,
       deletedAt: null,
     });
+
     return NextResponse.json({
       success: true,
       data: { categories, expenseCategories, incomeCategories },
@@ -101,8 +102,7 @@ export async function POST(request: Request) {
   }
   const { name, description, color, types } = await request.json();
   const normalizedCategoryName = name.toLowerCase().trim();
-  //before adding validate the data
-  //added later here
+  //validate the categories data
   const validateData = validateCategoreis({ name, color, types, description });
   if (Object.keys(validateData).length > 0) {
     return NextResponse.json({

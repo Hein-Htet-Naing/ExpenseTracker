@@ -40,6 +40,10 @@ export const CategorySpendingChart: React.FC<CategorySpendingChartProps> = ({
     plugins: {
       legend: {
         position: "top" as const,
+        labels: {
+          usePointStyle: true,
+          padding: 15,
+        },
       },
       tooltip: {
         callbacks: {
@@ -65,7 +69,7 @@ export const CategorySpendingChart: React.FC<CategorySpendingChartProps> = ({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="w-1/2 mr-auto ml-auto h-[400px] max-w-[400px]">
+        <div className="w-1/2 mx-auto h-[400px] max-w-[400px]">
           {categorySpending.length < 0 ? (
             <div className="flex items-center justify-center h-full">
               <p className="text-muted-foreground">No data available</p>
@@ -77,7 +81,7 @@ export const CategorySpendingChart: React.FC<CategorySpendingChartProps> = ({
         {categorySpending.length > 0 && (
           <div className="mt-4 p-3 bg-muted rounded-lg">
             <div className="text-sm text-muted-foreground">
-              Total:{" "}
+              Total:
               <span className="font-semibold text-foreground">
                 ${totalAmount.toFixed(2)}
               </span>

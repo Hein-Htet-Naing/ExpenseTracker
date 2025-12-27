@@ -26,11 +26,7 @@ export interface ExpenseFilters {
   minAmount?: number;
   maxAmount?: number;
 }
-export interface ExpenseSummary {
-  total: number;
-  byCategory: { categoryId: string; total: number }[];
-  monthlyTrend: { month: string; total: number }[];
-}
+
 export interface ExpenseRespone {
   success: boolean;
   data: Expense;

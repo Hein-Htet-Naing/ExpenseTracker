@@ -1,12 +1,13 @@
 import mongoose, { ObjectId } from "mongoose";
 
-interface queryProps {
+export interface queryProps {
   userId: string;
   startDate?: string;
   endDate?: string;
   minAmount?: number;
   maxAmount?: number;
   categoryIds?: string[];
+  IcategoryIds?: string[];
 }
 
 export function buildExpenseQueryAndPipeline({
@@ -41,7 +42,6 @@ export function buildExpenseQueryAndPipeline({
       $in: categoryIds.map((id) => new mongoose.Types.ObjectId(id)),
     };
   }
-
   // Aggregation pipeline
   const pipeline: any[] = [
     { $match: match },
@@ -79,8 +79,19 @@ export function buildExpenseQueryAndPipeline({
           {
             $lookup: {
               from: "categories",
-              localField: "_id",
-              foreignField: "_id",
+              let: { catId: "$_id" },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $and: [
+                        { $eq: ["$_id", "$$catId"] },
+                        { $eq: ["$deletedAt", null] },
+                      ],
+                    },
+                  },
+                },
+              ],
               as: "category",
             },
           },
@@ -99,6 +110,7 @@ export function buildExpenseQueryAndPipeline({
       },
     },
   ];
+
   const MonthlySpendingPipeline: any[] = [
     { $match: match },
     {
@@ -132,7 +144,7 @@ export function buildExpenseQueryAndPipeline({
     },
   ];
 
-  const CategoriesSpending = [
+  const CategoriesSpendings: any[] = [
     { $match: match },
     {
       $facet: {
@@ -212,13 +224,5 @@ export function buildExpenseQueryAndPipeline({
   ];
   //percentage = ($cs.amount / grandTotalCategoryExpense ) x 100
 
-  const recentExpense = [
-    {
-      $match: match,
-    },
-    {
-      $sort: { createdAt: -1 },
-    },
-  ];
-  return { pipeline, MonthlySpendingPipeline, CategoriesSpending };
+  return { pipeline, MonthlySpendingPipeline, CategoriesSpendings };
 }

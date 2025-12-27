@@ -2,7 +2,6 @@
 import {
   LayoutDashboard,
   CircleDollarSign,
-  Banknote,
   Grid2X2,
   PiggyBank,
   ChartCandlestick,
@@ -32,7 +31,6 @@ const navigation = [
     href: "/dashboard/reports",
     icon: <ChartCandlestick />,
   },
-  { name: "Budget", href: "/dashboard/budget", icon: <Banknote /> },
 ];
 export const Sidebar = () => {
   const pathName = usePathname();
